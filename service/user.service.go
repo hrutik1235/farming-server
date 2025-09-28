@@ -33,6 +33,28 @@ func (u *UserService) GetUserLand(userId primitive.ObjectID) (*models.Land, erro
 	return &land, err
 }
 
+func (u *UserService) GetUserLandUnits(userId primitive.ObjectID) ([]models.LandUnit, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var landUnits []models.LandUnit
+
+	cursor, err := u.Client.Collection(utils.LandUnitsCollection).Find(ctx, bson.M{"owner_id": userId})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	err = cursor.All(ctx, &landUnits)
+
+	fmt.Println("LAND UNITS: ", len(landUnits))
+
+	if err != nil {
+		return nil, err
+	}
+	return landUnits, nil
+}
+
 func (u *UserService) FindUserByCriteria(filter bson.M) (*models.User, error) {
 	var user models.User
 
@@ -53,7 +75,7 @@ func (u *UserService) GetUserById(userId primitive.ObjectID) (*models.User, erro
 
 	var user models.User
 
-	err := u.Client.Collection(utils.UsersCollection).FindOne(ctx, models.User{UserID: userId}).Decode(&user)
+	err := u.Client.Collection(utils.UsersCollection).FindOne(ctx, bson.M{"_id": userId}).Decode(&user)
 
 	return &user, err
 }
@@ -157,6 +179,7 @@ func (u *UserService) AllocateLandToUser(userId primitive.ObjectID, username str
 			OwnerID:     userId,
 			SizeUnits:   1,
 			IsLeased:    false,
+			Position:    i + 1,
 			IsAvailable: true,
 		}
 		landUnits[i] = landUnit

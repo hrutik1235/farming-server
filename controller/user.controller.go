@@ -28,6 +28,42 @@ func NewUserController(dbClient *mongo.Database) *UserController {
 	}
 }
 
+func (userController *UserController) GetUserDetails(c *gin.Context) {
+	userId := c.GetHeader("user_id")
+
+	userObjectId, _ := primitive.ObjectIDFromHex(userId)
+
+	user, err := userController.service.GetUserById(userObjectId)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.NewHttpError(c, "User Error", http.StatusInternalServerError))
+		return
+	}
+
+	wallet, err := userController.service.GetUserWallet(userObjectId)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.NewHttpError(c, "Wallet Error", http.StatusInternalServerError))
+		return
+	}
+
+	landUnits, err := userController.service.GetUserLandUnits(userObjectId)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, utils.NewHttpError(c, "Land Error", http.StatusInternalServerError))
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": gin.H{
+			"user":   user,
+			"wallet": wallet,
+			"land":   landUnits,
+		},
+	})
+
+}
+
 func (userController *UserController) RegisterUser(c *gin.Context) {
 	body := c.MustGet("body").(types.RegisterUser)
 
@@ -43,8 +79,12 @@ func (userController *UserController) RegisterUser(c *gin.Context) {
 		"email":    body.Email,
 	})
 
+
 	if prevuser != nil {
-		c.JSON(http.StatusBadRequest, utils.NewHttpError(c, "User already exists", http.StatusBadRequest))
+		c.JSON(200, gin.H{
+			"message": "User already exists",
+			"data":    prevuser.ID,
+		})
 		return
 	}
 

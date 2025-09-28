@@ -14,6 +14,7 @@ type LandUnit struct {
 	SizeUnits   int                `bson:"size_units" json:"size_units"`
 	IsLeased    bool               `bson:"is_leased" json:"is_leased"`
 	IsAvailable bool               `bson:"is_available" json:"is_available"`
+	Position    int                `bson:"position" json:"position"`
 	Location    string             `bson:"location,omitempty" json:"location,omitempty"` // Optional: for future expansion
 }
 

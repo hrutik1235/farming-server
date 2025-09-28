@@ -13,12 +13,16 @@ func NewUserRoutes(r *gin.RouterGroup, conn *grpc.ClientConn, dbClient *mongo.Da
 	userController := controller.NewUserController(dbClient)
 	group := r.Group("/user")
 
-	group.GET("/me", func(c *gin.Context) {
+	group.POST("/me", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "OK",
 		})
 	})
 
-	group.Use(middleware.GateValidateUser())
+
 	group.POST("/register", middleware.ValidateRequest[types.RegisterUser, types.AuthHeader, any](), userController.RegisterUser)
+
+	group.Use(middleware.GateValidateUser())
+
+	group.GET("", userController.GetUserDetails)
 }

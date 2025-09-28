@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/hrutik1235/farming-server/router"
 	"github.com/hrutik1235/farming-server/utils"
@@ -40,6 +41,8 @@ func main() {
 	}
 
 	router := gin.Default()
+
+	router.Use(cors.Default())
 
 	group := router.Group("/api/v1")
 
