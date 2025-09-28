@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type Trade struct {
 	BaseModel    `bson:",inline"`
@@ -20,14 +24,14 @@ type Trade struct {
 
 type MarketPrice struct {
 	BaseModel     `bson:",inline"`
-	CropID        string    `bson:"crop_id" json:"crop_id"`
-	CurrentPrice  float64   `bson:"current_price" json:"current_price"`
-	BasePrice     float64   `bson:"base_price" json:"base_price"`
-	DemandFactor  float64   `bson:"demand_factor" json:"demand_factor"`
-	SupplyFactor  float64   `bson:"supply_factor" json:"supply_factor"`
-	LastUpdated   time.Time `bson:"last_updated" json:"last_updated"`
-	ValidUntil    time.Time `bson:"valid_until" json:"valid_until"`
-	ChangePercent float64   `bson:"change_percent" json:"change_percent"`
+	CropID        primitive.ObjectID `bson:"crop_id" json:"crop_id"`
+	CurrentPrice  float64            `bson:"current_price" json:"current_price"`
+	BasePrice     float64            `bson:"base_price" json:"base_price"`
+	DemandFactor  float64            `bson:"demand_factor" json:"demand_factor"`
+	SupplyFactor  float64            `bson:"supply_factor" json:"supply_factor"`
+	LastUpdated   time.Time          `bson:"last_updated" json:"last_updated"`
+	ValidUntil    time.Time          `bson:"valid_until" json:"valid_until"`
+	ChangePercent float64            `bson:"change_percent" json:"change_percent"`
 }
 
 type PriceHistory struct {

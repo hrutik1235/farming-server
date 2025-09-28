@@ -7,7 +7,7 @@ import (
 )
 
 type HarvestResult struct {
-	HarvestID         string             `bson:"harvest_id" json:"harvest_id"`
+	ID                primitive.ObjectID `bson:"_id" json:"_id"`
 	PlantingID        primitive.ObjectID `bson:"planting_id" json:"planting_id"`
 	UserID            primitive.ObjectID `bson:"user_id" json:"user_id"`
 	CropID            primitive.ObjectID `bson:"crop_id" json:"crop_id"`

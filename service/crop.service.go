@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/hrutik1235/farming-server/models"
@@ -183,4 +184,39 @@ func (p *CropService) GetUserPlantedCrops(ctx context.Context, userID primitive.
 
 	err = cursor.All(ctx, &plantedCrops)
 	return plantedCrops, err
+}
+
+func (p *CropService) CalculateCurrentGrowth(crop models.PlantedCrop) float64 {
+	now := time.Now()
+	totalDuration := crop.ExpectedHarvestAt.Sub(crop.PlantedAt)
+	elapsedDuration := now.Sub(crop.PlantedAt)
+
+	if elapsedDuration <= 0 {
+		return 0.0
+	}
+
+	if elapsedDuration >= totalDuration {
+		return 1.0
+	}
+
+	return math.Max(0.0, math.Min(1.0, float64(elapsedDuration)/float64(totalDuration)))
+}
+
+func (p *CropService) UpdateCropGrowthInDB(ctx context.Context, plantingID string, growthPercentage float64) error {
+	collection := p.Client.Collection(utils.PlantedCropsCollection)
+
+	_, err := collection.UpdateOne(
+		ctx,
+		bson.M{"planting_id": plantingID},
+		bson.M{"$set": bson.M{
+			"growth_percentage": growthPercentage,
+			"updated_at":        time.Now(),
+		}},
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

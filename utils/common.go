@@ -1,9 +1,11 @@
 package utils
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type HttpError[T any] struct {
@@ -42,3 +44,21 @@ const (
 const (
 	InitialLandUnitSize = 100
 )
+
+func ConvertObjectIdsFromStringIds(ids []string) ([]primitive.ObjectID, error) {
+	objectIDs := make([]primitive.ObjectID, len(ids))
+
+	for i, idStr := range ids {
+		if !primitive.IsValidObjectID(idStr) {
+			return nil, fmt.Errorf("invalid object ID at index %d: %s", i, idStr)
+		}
+
+		objID, err := primitive.ObjectIDFromHex(idStr)
+		if err != nil {
+			return nil, fmt.Errorf("error converting ID %s: %v", idStr, err)
+		}
+		objectIDs[i] = objID
+	}
+
+	return objectIDs, nil
+}

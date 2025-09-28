@@ -99,12 +99,11 @@ func (u *UserService) DeductPlantingCost(userId primitive.ObjectID, cost float64
 		return fmt.Errorf("insufficient balance: have %.2f, need %.2f", wallet.Balance, cost)
 	}
 
-	// Perform the update with atomic operation
 	result, err := collection.UpdateOne(
 		ctx,
 		bson.M{
 			"user_id": userId,
-			"balance": bson.M{"$gte": cost}, // Ensure balance doesn't go negative
+			"balance": bson.M{"$gte": cost},
 		},
 		bson.M{
 			"$inc": bson.M{
@@ -123,7 +122,6 @@ func (u *UserService) DeductPlantingCost(userId primitive.ObjectID, cost float64
 	}
 
 	if result.MatchedCount == 0 {
-		// This could happen if balance was insufficient between check and update
 		return fmt.Errorf("unable to deduct cost: insufficient balance or wallet not found")
 	}
 
